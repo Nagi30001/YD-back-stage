@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.youdaoxsj.backstage.information.mapper.DriverInformationMapper">
+
+    <sql id="zbqsql">
+      z.id,
+      z.device,
+      z.code,
+      z.driver_name,
+      z.mobile,
+      z.district_id,
+      z.online_time,
+      z.init_time,
+      z.advert_id,
+      z.last_login_time,
+      z.last_report_time,
+      z.report_ip,
+      z.record_time,
+      z.status,
+      z.car_number,
+      z.bank_no,
+      z.bank_name,
+      z.longintude,
+      z.latitude,
+      z.driver_id,
+      z.push_code
+    </sql>
+    <!--public Device selectDriverInformation();-->
+    <select id="selectDriverInformation" resultType="com.youdaoxsj.backstage.information.bean.ZbqDevice">
+        SELECT <include refid="zbqsql"/> FROM zbq_advert z
+    </select>
+
+    <!--public ExtendInformation selectSIMInformation-->
+    <select id="selectSIMInformation" resultType="com.youdaoxsj.backstage.information.bean.ExtendInformation" parameterType="java.lang.Integer">
+        select * from zbq_extend_information where id=#{id}
+    </select>
+
+    <!--public Integer reviseExtendInformation(ExtendInformation extendInformation)-->
+    <update id="reviseExtendInformation" parameterType="com.youdaoxsj.backstage.information.bean.ExtendInformation" >
+        update zbq_extend_information set
+        device_iccid = #{e.deviceIccid},
+        iccid_traffic = #{e.iccidTraffic},
+        iccid_onLine = #{e.iccidOnLine},
+        iccid_state = #{e.iccidState},
+        iccid_limit = #{e.iccidLimit},
+        iccid_activate = #{e.iccidActivate},
+        device_note = #{e.deviceNote}
+        where device_id = #{id}
+    </update>
+
+    <!--public Integer insertExtendInformation(ExtendInformation extendInformation)-->
+    <insert id="insertExtendInformation" parameterType="com.youdaoxsj.backstage.information.bean.ExtendInformation" >
+        INSERT INTO zbq_extend_information(device_id, <if test="#{e.deviceIccid} == null">device_iccid, iccid_traffic, iccid_onLine, iccid_state, iccid_limit, iccid_activate,</if> device_note)
+        VALUES (#{e.deviceId},
+        <if test="#{e.deviceIccid} == null">
+            #{e.deviceIccid},#{e.iccidTraffic},#{e.iccidOnLine},#{e.iccidState},#{e.iccidLimit},#{e.iccidActivate},
+        </if>>
+        #{e.deviceNote})
+    </insert>
+
+
+    <!--public Device selectDevice(Integer id);-->
+    <select id="selectDevice" resultType="com.youdaoxsj.backstage.information.bean.ZbqDevice" parameterType="java.lang.Integer">
+        select *  from zbq_device z where id=#{id}
+    </select>
+
+    <!--public ExtendInformation selectEI(Integer id);-->
+    <select id="selectEI" resultType="com.youdaoxsj.backstage.information.bean.ExtendInformation" parameterType="java.lang.Integer">
+        select * from zbq_extend_information where device_id = #{id}
+    </select>
+
+    <!--List<ZbqDevice> selectZbqDevices();-->
+    <select id="selectZbqDevices" resultType="zbqDevice">
+        select * from zbq_device where status=1
+    </select>
+</mapper>

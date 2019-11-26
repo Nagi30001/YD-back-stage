@@ -1,0 +1,56 @@
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://47.108.68.212:3306/advert?characterEncoding=UTF-8
+        username: advert
+        password: EZNyrEprMfwL2srp
+        type: com.alibaba.druid.pool.DruidDataSource
+        #   数据源其他配置
+        initialSize: 5
+        minIdle: 5
+        maxActive: 20
+        maxWait: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        #   配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+        filters: stat,wall,log4j
+        maxPoolPreparedStatementPerConnectionSize: 20
+        useGlobalDataSourceStat: true
+        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+    #控制台显示打印sql
+    jpa:
+        show-sql: true
+    thymeleaf:
+        prefix: classpath:/templates/
+        enabled: true
+        mode: HTML5
+        suffix: .html
+        check-template-location: true
+        encoding: UTF-8
+        servlet:
+            content-type: text/html
+        cache: false
+#application.properties/application.yml
+#以下是通过xml文件来进行查询
+mybatis:
+    # 指定全局配置文件位置
+    #  config-location: classpath:mybatis/mybatis-config.xml
+    # 指定sql映射文件位置
+    mapper-locations: classpath:mapper/*.xml
+    #扫描实例类,mapper.xml映射文件的返回类型就可与直接写类的小写
+    type-aliases-package: com.youdaoxsj.backstage.information.bean
+    #开启驼峰命名法 解决mapper.xml中 sh_id  =  shId  问题
+    configuration:
+        map-underscore-to-camel-case: true
+server:
+    port: 8080
+#更改日志输出等级
+logging:
+    level:
+        com:
+            jiuxia: trace

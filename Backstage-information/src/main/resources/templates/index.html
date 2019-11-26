@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>司机信息</title>
+</head>
+<body>
+<a>测试</a>
+<!--<p th:text="${extendDevices}"/>-->
+<table border="1">
+    <tr>
+        <th>司机姓名</th>
+        <th>司机电话</th>
+        <th>车牌号</th>
+        <th>司机当月时长</th>
+        <th>最后登录时间</th>
+        <th>最后上报时间</th>
+        <th>安装时间</th>
+        <th>ICCID</th>
+        <th>SIM卡状态</th>
+        <th>已用流量</th>
+    </tr>
+    <tr th:each = "extendDevice : ${extendDevices}">
+        <td th:text="${extendDevice.zbqDevice.driverName}"></td>
+        <td th:text="${extendDevice.zbqDevice.mobile}"></td>
+        <td th:text="${extendDevice.zbqDevice.carNumber}"></td>
+        <td th:text="${extendDevice.zbqDevice.onlineTime}"></td>
+        <td th:text="${extendDevice.zbqDevice.lastLoginTime}"></td>
+        <td th:text="${extendDevice.zbqDevice.lastReportTime}"></td>
+        <td th:text="${extendDevice.zbqDevice.recordTime}"></td>
+        <!--<td th:text="${extendDevice.extendInformation.deviceIccid}"></td>-->
+        <!--<td th:text="${extendDevice.extendInformation.iccidState}"></td>-->
+        <!--<td th:text="${extendDevice.extendInformation.iccidTraffic}"></td>-->
+    </tr>
+</table>
+</body>
+</html>
