@@ -3,7 +3,6 @@ package com.youdaoxsj.backstage.information.controller;
 
 import com.youdaoxsj.backstage.information.bean.ExtendDevice;
 import com.youdaoxsj.backstage.information.bean.IccidMsg;
-import com.youdaoxsj.backstage.information.bean.ZbqDevice;
 import com.youdaoxsj.backstage.information.service.DriverInformationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,55 +20,50 @@ public class DrverInformationController {
     private DriverInformationService driverInformationService;
 
 
-    @RequestMapping("/hello")
-    public String hello() {
-//        ExtendDevice extendDevice = driverInformationService.searchDev(id);
-//        modelMap.addAttribute("list",extendDevice);
+    /**
+     * 获取司机信息
+     * @param modelMap 返回数据
+     * @param sortName 排序字段
+     * @param sortPage 分页页码
+     * @return index.html
+     */
+    @RequestMapping("/hello1")
+    public String hello1(ModelMap modelMap,@RequestParam(value = "sortName", defaultValue = "last_report_time_asc") String sortName,@RequestParam(value = "sortPage", defaultValue = "1") Integer sortPage) {
+        List<ExtendDevice> extendDevices = driverInformationService.searchDevs(sortName,sortPage);
+        Integer lenght = driverInformationService.getZbqDeviceCount();
+        //司机信息
+        modelMap.addAttribute("extendDevices", extendDevices);
+        //总页数
+        modelMap.addAttribute("lenght",lenght);
+        //当前页
+        modelMap.addAttribute("sortPage",sortPage);
         return "index";
-
     }
 
     /**
-     * @param modelMap
-     * @param name
-     * @param type
-     * @return
+     * 查询某一个司机信息
+     * @param id 司机id
+     * @return  返回司机信息
      */
-    @RequestMapping("/hello1")
-    public String hello1(ModelMap modelMap, String name, String type,@RequestParam(value = "page", defaultValue = "1") Integer page) {
-        String name1 = "lastReportTime";
-        boolean b = false;
-
-        if (type == null || type == "") {
-            b = true;
-        } else if (type.equals("ESC")) {
-            b = false;
-        }
-        if (name != null) {
-            name1 = name;
-        }
-
-
-        List<ExtendDevice> extendDevices = driverInformationService.searchDevs(name1, b,page);
-        Integer lenght = driverInformationService.getDriverLenght();
-        modelMap.addAttribute("extendDevices", extendDevices);
-        modelMap.addAttribute("lenght",lenght);
-        modelMap.addAttribute("page",page);
-
-        return "index";
-    }
-
     @RequestMapping("/getDriver")
     @ResponseBody
     public ExtendDevice getDriver(Integer id) {
+        //某一个司机的信息
         ExtendDevice extendDevice = driverInformationService.searchDev(id);
         return extendDevice;
     }
 
+    /**
+     * 保存司机信息
+     * @param id 司机id
+     * @param driverIccid 司机iccid
+     * @param deviceNote  司机备注
+     * @return   状态码 1是成功 0是失败
+     */
     @RequestMapping("/saveEI")
     @ResponseBody
     public Integer saveEI(Integer id, String driverIccid, String deviceNote) {
-        System.out.println("====" + id + "+++++" + driverIccid + "+++++" + deviceNote);
+        //保存信息
         Integer state = driverInformationService.updateEI(id, driverIccid, deviceNote);
 
         return state;
@@ -78,52 +72,34 @@ public class DrverInformationController {
     /**
      * 根据查询条件查询
      *
-     * @param driverName
-     * @param driverPhone
-     * @param driverPlateNum
-     * @param modelMap
-     * @param name
-     * @param type
-     * @return
+     * @param driverName 司机姓名
+     * @param driverPhone 司机电话
+     * @param driverPlateNum 司机车牌号
+     * @param modelMap 返回的数据
+     * @param sortName 排序字段
+     * @param sortPage 分页页码
+     * @return 查询后的数据
      */
     @RequestMapping("/searchDriver")
-    public String searchDriver(String driverName, String driverPhone, String driverPlateNum, ModelMap modelMap, String name, boolean type,@RequestParam(value = "page", defaultValue = "1") Integer page) {
-        ZbqDevice zbqDevice = new ZbqDevice();
-
-        if (!driverName.isEmpty()) {
-            zbqDevice.setDriverName("%" + driverName + "%");
-        }
-        if (!driverPhone.isEmpty()) {
-            zbqDevice.setMobile("%" + driverPhone + "%");
-        }
-        if (!driverPlateNum.isEmpty()) {
-            zbqDevice.setCarNumber("%" + driverPlateNum + "%");
-        }
-        name = "lastLoginTime";
-        type = true;
-        System.out.println(zbqDevice.toString());
-        List<ExtendDevice> extendDevices = driverInformationService.searchDriverByzbq(zbqDevice, name, type,page);
-        Integer lenght = driverInformationService.getDriverLenght();
+    public String searchDriver(String driverName, String driverPhone, String driverPlateNum, ModelMap modelMap, String sortName,@RequestParam(value = "sortPage", defaultValue = "1") Integer sortPage) {
+        List<ExtendDevice> extendDevices = driverInformationService.searchDriverByzbq(driverName,driverPhone,driverPlateNum, sortName, sortPage);
+        Integer lenght = driverInformationService.getsearchDriverLenght();
+        //返回查询结果数据
         modelMap.addAttribute("extendDevices", extendDevices);
+        //返回查询结果页数
         modelMap.addAttribute("lenght",lenght);
-        modelMap.addAttribute("page",page);
-
+        //返回查询结果当前页数
+        modelMap.addAttribute("sortPage",sortPage);
 
         return "index";
     }
 
 
-
-    @RequestMapping("/getIccids")
-    @ResponseBody
-    public List<String> getIccids(){
-
-     List<String> iccids = driverInformationService.getIccids();
-
-        return iccids;
-    }
-
-
+    /**
+     * 获取ICCID信息
+     * @param iccid iccid
+     * @return  查询结果
+     */
     @RequestMapping("/getIccidMsg")
     @ResponseBody
     public IccidMsg getIccidMsg(String iccid){

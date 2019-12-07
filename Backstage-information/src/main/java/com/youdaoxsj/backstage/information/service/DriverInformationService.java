@@ -9,26 +9,27 @@ import java.util.List;
 public interface DriverInformationService {
 
 
-    public void searchDevice();
-
     /**
      * 查询一个司机信息
-     * @param id
-     * @return
+     *
+     * @param id 司机id
+     * @return  司机信息
      */
-    public ExtendDevice searchDev(Integer id);
+    ExtendDevice searchDev(Integer id);
 
 
     /**
-     * 查询全部司机信息
-     * @param name
-     * @param type
+     * 分页排序查询司机信息
+     *
+     * @param sortName 排序字段
+     * @param sortPage 页码
      * @return
      */
-    List<ExtendDevice> searchDevs(String name ,boolean type, Integer page);
+    List<ExtendDevice> searchDevs(String sortName, Integer sortPage);
 
     /**
      * 更新司机的扩展信息
+     *
      * @param zbqDeviceID
      * @param driverIccid
      * @param deviceNote
@@ -36,18 +37,35 @@ public interface DriverInformationService {
      */
     Integer updateEI(Integer zbqDeviceID, String driverIccid, String deviceNote);
 
+
     /**
-     * 根据查询条件获取到司机信息集合
-     * @param zbqDevice
-     * @param name
-     * @param type
+     * 根据查询条件查询数据
+     * @param driverName 司机姓名
+     * @param driverPhone 司机电话
+     * @param driverPlateNum 司机车牌号
+     * @param sortName 排序字段
+     * @param sortPage 排序页码
      * @return
      */
-    List<ExtendDevice> searchDriverByzbq(ZbqDevice zbqDevice,String name,boolean type,Integer page);
+    List<ExtendDevice> searchDriverByzbq(String driverName, String driverPhone, String driverPlateNum, String sortName, Integer sortPage);
 
-    List<String> getIccids();
-
-    Integer getDriverLenght();
-
+    /**
+     * 根据iccid发送http请求查询数据
+     * @param iccid
+     * @return
+     */
     IccidMsg searchIccidMsg(String iccid);
+
+    /**
+     * 获取设备列表总和排除禁用的
+     *
+     * @return 页数
+     */
+    Integer getZbqDeviceCount();
+
+    /**
+     * 查询条件下 总页数
+     * @return
+     */
+    Integer getsearchDriverLenght();
 }

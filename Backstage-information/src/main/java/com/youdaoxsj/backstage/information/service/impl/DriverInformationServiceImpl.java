@@ -23,21 +23,13 @@ public class DriverInformationServiceImpl implements DriverInformationService {
 
     private DateUtils dateUtils = new DateUtils();
 
-    private Integer lenght = 0;
+    private Integer lenght = 1;
 
-    private Integer index = 1;
+    /**
+     * 每页多少行
+     */
+    private static Integer PAGE_NUM = 50;
 
-
-    @Override
-    public void searchDevice() {
-//        List<Device> devices = driverInformationMapper.selectDriverInformation();
-
-//        for (Device d : devices) {
-//            if (d.getId().equals(655)){
-//                System.out.println(d.toString());
-//            }
-//        }
-    }
 
     @Override
     public ExtendDevice searchDev(Integer id) {
@@ -58,9 +50,13 @@ public class DriverInformationServiceImpl implements DriverInformationService {
     }
 
     @Override
-    public List<ExtendDevice> searchDevs(String name, boolean type,Integer page) {
-        List<ZbqDevice> zbqDevices = driverInformationMapper.selectZbqDevices();
-        List<ExtendDevice> extendDevices = getExtendDevices(zbqDevices, name, type,page);
+    public List<ExtendDevice> searchDevs(String sortName, Integer sortPage) {
+        if (sortName.isEmpty()) {
+            sortName = "last_report_time_asc";
+        }
+        sortPage = sortPage * 50 - 50;
+        List<ZbqDevice> zbqDevices = driverInformationMapper.selectDevices(sortName, sortPage, PAGE_NUM);
+        List<ExtendDevice> extendDevices = getExtendDevice(zbqDevices);
         return extendDevices;
     }
 
@@ -83,44 +79,50 @@ public class DriverInformationServiceImpl implements DriverInformationService {
     }
 
     @Override
-    public List<ExtendDevice> searchDriverByzbq(ZbqDevice zbqDevice, String name, boolean type, Integer page) {
-
-
-        List<ZbqDevice> zbqDevices = driverInformationMapper.searchDriverByzbq(zbqDevice);
-        System.out.println(zbqDevices.toString());
-        List<ExtendDevice> extendDevices = getExtendDevices(zbqDevices, name, type, page);
-
-
-        return extendDevices;
-    }
-
-    @Override
-    public List<String> getIccids() {
-
-        List<ExtendInformation> extendInformations = driverInformationMapper.selectExtendInformation();
-        List<String> iccids = new ArrayList<>();
-        for (ExtendInformation extendInformation : extendInformations) {
-            if (extendInformation.getDeviceIccid() != null && extendInformation.getDeviceIccid() != "---") {
-                iccids.add(extendInformation.getDeviceIccid());
-            }
-
+    public List<ExtendDevice> searchDriverByzbq(String driverName, String driverPhone, String driverPlateNum, String sortName, Integer sortPage) {
+        ZbqDevice zbqDevice = new ZbqDevice();
+        if (!driverName.isEmpty()) {
+            zbqDevice.setDriverName("%" + driverName + "%");
+        }
+        if (!driverPhone.isEmpty()) {
+            zbqDevice.setMobile("%" + driverPhone + "%");
+        }
+        if (!driverPlateNum.isEmpty()) {
+            zbqDevice.setCarNumber("%" + driverPlateNum + "%");
         }
 
-        driverInformationMapper.selectExtendInformation();
+        if (sortName.equals("时长排序")) {
+            sortName = "online_time_asc";
+        } else if (sortName.equals("上报时间")) {
+            sortName = "last_report_time_asc";
+        } else if (sortName.equals("安装时间")) {
+            sortName = "record_time_asc";
+        } else {
+            sortName = "last_report_time_asc";
+        }
 
-        return iccids;
+
+        sortPage = sortPage * 50 - 50;
+
+        List<ZbqDevice> zbqDevices = driverInformationMapper.searchDriverByzbq(zbqDevice, sortName, sortPage, PAGE_NUM);
+        int integer = zbqDevices.size();
+        if (integer % 50 == 0) {
+            lenght = integer / 50;
+        } else {
+            lenght = integer / 50 + 1;
+        }
+
+        List<ExtendDevice> extendDevice = getExtendDevice(zbqDevices);
+
+        return extendDevice;
     }
 
-    @Override
-    public Integer getDriverLenght() {
-        return lenght;
-    }
 
     @Override
     public IccidMsg searchIccidMsg(String iccid) {
         String status;
         IccidMsg iccidMsg = HttpRequest.sendGet(iccid);
-        if (iccidMsg.getStatus() != null){
+        if (iccidMsg.getStatus() != null) {
             if (iccidMsg.getStatus().equals("ACTIVATED")) {
                 status = "已激活";
             } else if (iccidMsg.getStatus().equals("DEACTIVATED")) {
@@ -141,138 +143,106 @@ public class DriverInformationServiceImpl implements DriverInformationService {
         }
     }
 
-
-    public DataICCID searchICCID() {
-
-
-        return null;
+    @Override
+    public Integer getZbqDeviceCount() {
+        Integer integer = driverInformationMapper.selectConutZbqDevice();
+        if (integer % 50 == 0) {
+            integer = integer / 50;
+        } else {
+            integer = integer / 50 + 1;
+        }
+        return integer;
     }
 
-    public List<ExtendDevice> getExtendDevices(List<ZbqDevice> zbqDevices, String name, boolean type, Integer page) {
+    @Override
+    public Integer getsearchDriverLenght() {
+        return lenght;
+    }
 
 
-        List<ExtendDevice> extendDevices = new ArrayList<>();
+    /**
+     * 将PHP的时间戳转换成格式时间
+     * 在线时长和平均时长转换
+     *
+     * @param zbqDevices
+     * @return
+     */
+    public List<ZbqDevice> getFormatTime(List<ZbqDevice> zbqDevices) {
+        //时间格式
         SimpleDateFormat df = new SimpleDateFormat("yyy/MM/dd HH:mm:ss");
-
-        List<ZbqDevice> zbqDevices2 = new ArrayList<>();
+        //获取当月已过多少小时，精确到小时
+        Calendar calendar = Calendar.getInstance();
+        int curHour24 = calendar.get(calendar.HOUR_OF_DAY);
+        String data1 = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String[] data2 = data1.split("-");
+        double nn = Integer.parseInt(data2[2]) + curHour24 / 24.0;
 
         for (ZbqDevice zz : zbqDevices) {
-            if (zz.getStatus() == 1) {
-                zbqDevices2.add(zz);
-            }
-        }
-
-
-//        System.err.println(zbqDevices.toString());
-        for (ZbqDevice zz : zbqDevices2) {
-//            System.out.println(zz.toString());
-            if (zz.getLastLoginTime().isEmpty() || zz.getLastReportTime().isEmpty() || zz.getRecordTime().isEmpty() || zz.getStatus() != 1) {
-                break;
-            }
-//            zz.setInitTime(df.format(Long.parseLong(zz.getInitTime() + "000")));
             zz.setLastLoginTime(df.format(Long.parseLong(zz.getLastLoginTime() + "000")));
             zz.setLastReportTime(df.format(Long.parseLong(zz.getLastReportTime() + "000")));
             zz.setRecordTime(df.format(Long.parseLong(zz.getRecordTime() + "000")));
+            zz.setOnlineTime2(Double.parseDouble(String.format("%.2f", (zz.getOnlineTime() / 3600))));
+            zz.setPjsj(Double.parseDouble(String.format("%.2f", zz.getOnlineTime2() / nn)));
 
-//            zz.setLastLoginTime2(df.format(Long.parseLong(zz.getLastLoginTime() + "000")));
-
-//            zz.setOnlineTime(String.format("%.2f",Double.parseDouble(zz.getOnlineTime())/3600));
-
-
-            zz.setOnlineTime(Double.parseDouble(String.format("%.2f", zz.getOnlineTime() / 3600)));
-
-//            ExtendInformation extendInformation = new ExtendInformation();
-//            extendInformation = driverInformationMapper.selectEI(zz.getId());
-
-
-            Calendar calendar = Calendar.getInstance();
-            int curHour24 = calendar.get(calendar.HOUR_OF_DAY);
-            String data1 = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-            String[] data2 = data1.split("-");
-
-            double nn = Integer.parseInt(data2[2]) + curHour24 / 24.0;
-
-
-//            zz.setPjsj(String.format("%.2f",Double.parseDouble(zz.getOnlineTime())/nn));
-
-            zz.setPjsj(Double.parseDouble(String.format("%.2f", zz.getOnlineTime() / nn)));
-
-//
 
         }
+        return zbqDevices;
 
 
-        dateUtils.sort(zbqDevices2, name, type);
+    }
 
-        if (zbqDevices2.size()%50 == 0){
-            lenght = zbqDevices2.size()/50;
-        } else {
-            lenght = zbqDevices2.size()/50 +1;
-        }
-        List<ZbqDevice> zbqDeviceList = new ArrayList<>();
-        if (page == 0) {
-            page = 1;
-        }
-        for (int i = (page - 1)*50 ; i < page * 50 ; i++) {
-            try {
-                zbqDeviceList.add(zbqDevices2.get(i));
-            } catch (Exception e){
-                break;
-            }
+    /**
+     * 获取该列司机信息的拓展信息
+     *
+     * @param zbqDevices
+     * @return
+     */
+    public List<ExtendDevice> getExtendDevice(List<ZbqDevice> zbqDevices) {
 
-        }
-
-
-        for (ZbqDevice zz : zbqDeviceList) {
-
-
-//            try {
-//                if (index%15 == 0)
-//                index ++;
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-            ExtendInformation extendInformation = driverInformationMapper.selectEI(zz.getId());
-
+        List<ExtendDevice> extendDevices = new ArrayList<>();
+        zbqDevices = getFormatTime(zbqDevices);
+        for (ZbqDevice zbqDevice : zbqDevices) {
+            ExtendInformation extendInformation = driverInformationMapper.selectEI(zbqDevice.getId());
+            //判断拓展信息是否为null
             if (extendInformation == null) {
                 extendInformation = new ExtendInformation();
             }
-
-//            System.out.println(extendInformation.toString());
             if (extendInformation.getDeviceIccid() != null && !extendInformation.getDeviceIccid().trim().equals("---")) {
-                System.out.println(extendInformation.toString());
-                IccidMsg iccidMsg = HttpRequest.sendGet(extendInformation.getDeviceIccid().trim());
-                System.out.println(iccidMsg.toString());
-                String status = null;
-                if (iccidMsg.getStatus() != null){
-                    if (iccidMsg.getStatus().equals("ACTIVATED")) {
-                        status = "已激活";
-                    } else if (iccidMsg.getStatus().equals("DEACTIVATED")) {
-                        status = "已停用";
-                    } else if (iccidMsg.getStatus().equals("TEST_READY")) {
-                        status = "可测试";
-                    } else {
-                        status = "已失效";
-                    }
-                    extendInformation.setIccidState(status);
-                    extendInformation.setIccidTraffic(Double.parseDouble(String.format("%.2f", iccidMsg.getCtdDataUsage() / 1048576)));
-                }
-
-
+                //获取ICCID相关信息
+                extendInformation = getExtendInformationByEX(extendInformation);
             }
             ExtendDevice extendDevice = new ExtendDevice();
             extendDevice.setExtendInformation(extendInformation);
-            extendDevice.setZbqDevice(zz);
+            extendDevice.setZbqDevice(zbqDevice);
             extendDevices.add(extendDevice);
         }
-
         return extendDevices;
     }
 
-    public void getIccidMsg() {
 
-
+    /**
+     * 根据ICCID获取更多拓展信息
+     *
+     * @param extendInformation 查询对象
+     * @return
+     */
+    public ExtendInformation getExtendInformationByEX(ExtendInformation extendInformation) {
+        IccidMsg iccidMsg = HttpRequest.sendGet(extendInformation.getDeviceIccid().trim());
+        String status;
+        if (iccidMsg.getStatus() != null) {
+            if (iccidMsg.getStatus().equals("ACTIVATED")) {
+                status = "已激活";
+            } else if (iccidMsg.getStatus().equals("DEACTIVATED")) {
+                status = "已停用";
+            } else if (iccidMsg.getStatus().equals("TEST_READY")) {
+                status = "可测试";
+            } else {
+                status = "已失效";
+            }
+            extendInformation.setIccidState(status);
+            extendInformation.setIccidTraffic(Double.parseDouble(String.format("%.2f", iccidMsg.getCtdDataUsage() / 1048576)));
+        }
+        return extendInformation;
     }
 
 }

@@ -32,9 +32,12 @@ public class ZbqDevice {
     private String latitude;
     private Integer driverId;
     private Integer pushCode;
+
+
+    private Double onlineTime2;
     private Double  pjsj;
 
-    private Date recordTime2;
+
     private Date lastLoginTime2;
     private Date lastReportTime2;
 

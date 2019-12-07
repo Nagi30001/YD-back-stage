@@ -27,17 +27,7 @@
       z.driver_id,
       z.push_code
     </sql>
-    <!--public Device selectDriverInformation();-->
-    <select id="selectDriverInformation" resultType="com.youdaoxsj.backstage.information.bean.ZbqDevice">
-        SELECT
-        <include refid="zbqsql"/>
-        FROM zbq_advert z
-    </select>
 
-    <!--public ExtendInformation selectSIMInformation-->
-    <select id="selectSIMInformation" resultType="com.youdaoxsj.backstage.information.bean.ExtendInformation" parameterType="java.lang.Integer">
-        select * from zbq_extend_information where id=#{id}
-    </select>
 
     <!--public int updateExtendInformation(@Param("e") ExtendInformation extendInformation);-->
     <update id="updateExtendInformation">
@@ -79,7 +69,8 @@
 
 
     <!--public Device selectDevice(Integer id);-->
-    <select id="selectDevice" resultType="com.youdaoxsj.backstage.information.bean.ZbqDevice" parameterType="java.lang.Integer">
+    <select id="selectDevice" resultType="com.youdaoxsj.backstage.information.bean.ZbqDevice"
+            parameterType="java.lang.Integer">
         select *  from zbq_device z where id=#{id}
     </select>
 
@@ -88,26 +79,47 @@
         select * from zbq_extend_information where device_id = #{id}
     </select>
 
-    <!--List<ZbqDevice> selectZbqDevices();-->
-    <select id="selectZbqDevices" resultType="zbqDevice">
-        select * from zbq_device
-    </select>
-
-    <!--ZbqDevice searchDriverByzbq(ZbqDevice zbqDevice);-->
+    <!--List<ZbqDevice> searchDriverByzbq(@Param("zz") ZbqDevice zbqDevice,@Param("sortName") String sortName,@Param("sortPage") Integer sortPage,@Param("num") int num);-->
     <select id="searchDriverByzbq" resultType="com.youdaoxsj.backstage.information.bean.ZbqDevice">
         SELECT *
         FROM zbq_device
         <where>
-            <if test="driverName != null ">
-                and driver_name LIKE #{driverName}
+            <if test="zz.driverName != null ">
+                and driver_name LIKE #{zz.driverName}
             </if>
-            <if test="mobile != null ">
-                and mobile LIKE #{mobile}
+            <if test="zz.mobile != null ">
+                and mobile LIKE #{zz.mobile}
             </if>
-            <if test="carNumber != null ">
-                AND car_number LIKE #{carNumber}
+            <if test="zz.carNumber != null ">
+                AND car_number LIKE #{zz.carNumber}
             </if>
         </where>
+        <choose>
+            <when test="sortName != null and sortName == 'online_time_asc' ">
+                order by online_time asc
+            </when>
+            <when test="sortName != null and sortName == 'online_time_desc' ">
+                order by online_time desc
+            </when>
+            <when test="sortName != null and sortName == 'last_report_time_asc' ">
+                order by last_report_time asc
+            </when>
+            <when test="sortName != null and sortName == 'last_report_time_desc' ">
+                order by last_report_time desc
+            </when>
+            <when test="sortName != null and sortName == 'record_time_asc'">
+                order by record_time asc
+            </when>
+            <when test="sortName != null and sortName == 'record_time_desc'">
+                order by record_time desc
+            </when>
+            <otherwise>
+                order by last_report_time asc
+            </otherwise>
+        </choose>
+        <if test="sortName != null and num != null">
+            limit #{sortPage},#{num}
+        </if>
     </select>
 
     <!--List<ExtendInformation> selectExtendInformation();-->
@@ -116,16 +128,52 @@
     </select>
 
 
-    <!--List<ZbqDevice> selectOnLineTime();-->
+    <!--List<ZbqDevice> selectOnLineTime(Integer integer);-->
     <select id="selectOnLineTime" resultType="com.youdaoxsj.backstage.information.bean.ZbqReport">
-        select device_id,driver_name,sum(online_time) as online_time from zbq_report where record_time > 1575129600 group by device_id
+        select device_id,driver_name,sum(online_time) as online_time from zbq_report where record_time > #{integer} group by device_id
     </select>
 
 
-    <!-- Integer updateZbqDevice();-->
-    <update id="updateZbqDevice" >
+    <!-- nteger updateZbqDevice(Integer deviceId);-->
+    <update id="updateZbqDevice">
         update zbq_device set online_time = #{onlineTime} where id = #{deviceId}
     </update>
 
+
+    <!--  List<ZbqDevice> selectDevices(@Param("sortName") String name,@Param("sortPage") Integer page,@Param("sortType") String sortType,@Param("num") int i);  -->
+    <select id="selectDevices" resultType="com.youdaoxsj.backstage.information.bean.ZbqDevice">
+        select * from zbq_device z where status = 1
+        <choose>
+            <when test="sortName != null and sortName == 'online_time_asc' ">
+                order by online_time asc
+            </when>
+            <when test="sortName != null and sortName == 'online_time_desc' ">
+                order by online_time desc
+            </when>
+            <when test="sortName != null and sortName == 'last_report_time_asc' ">
+                order by last_report_time asc
+            </when>
+            <when test="sortName != null and sortName == 'last_report_time_desc' ">
+                order by last_report_time desc
+            </when>
+            <when test="sortName != null and sortName == 'record_time_asc'">
+                order by record_time asc
+            </when>
+            <when test="sortName != null and sortName == 'record_time_desc'">
+                order by record_time desc
+            </when>
+            <otherwise>
+                order by last_report_time asc
+            </otherwise>
+        </choose>
+        <if test="sortName != null and num != null">
+            limit #{sortPage},#{num}
+        </if>
+    </select>
+
+    <!--     Integer selectConutZbqDevice();-->
+    <select id="selectConutZbqDevice" resultType="java.lang.Integer">
+        select count(*)  from zbq_device where status = 1
+    </select>
 
 </mapper>

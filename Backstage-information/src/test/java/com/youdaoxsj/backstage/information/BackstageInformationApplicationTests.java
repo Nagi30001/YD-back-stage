@@ -3,6 +3,8 @@ package com.youdaoxsj.backstage.information;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.util.Auth;
+import com.youdaoxsj.backstage.information.bean.ExtendDevice;
+import com.youdaoxsj.backstage.information.bean.ZbqDevice;
 import com.youdaoxsj.backstage.information.mapper.DriverInformationMapper;
 import com.youdaoxsj.backstage.information.util.Qiniu;
 import com.youdaoxsj.backstage.information.util.SmsManager;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -42,14 +45,20 @@ class BackstageInformationApplicationTests {
 //            System.out.println(integer);
 //        }
 
+//    测试短信功能
+//        String[] str = {"17695796277"};
+//
+//        Map<String, String> map = new HashMap<>();
+//        map.put("driverName", "任康");
+//        map.put("onlinTome", "123");
+//        Response response = smsManager.sendMessage("1202791626972340224", str, map);
+//        System.out.println("response===="+response);
 
-        String[] str = {"17695796277"};
 
-        Map<String, String> map = new HashMap<>();
-        map.put("driverName", "任康");
-        map.put("onlinTome", "123");
-        Response response = smsManager.sendMessage("1202791626972340224", str, map);
-        System.out.println("response===="+response);
+//        List<ZbqDevice> zbqDevices = driverInformationMapper.selectDevices("online_time_asc", 0, "sort_asc", 50);
+//        for (ZbqDevice zbqDevice : zbqDevices){
+//            System.out.println(zbqDevice.toString());
+//        }
 
     }
 
