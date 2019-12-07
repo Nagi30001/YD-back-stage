@@ -1,9 +1,9 @@
 spring:
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://47.108.68.212:3306/advert?characterEncoding=UTF-8
-        username: advert
-        password: EZNyrEprMfwL2srp
+        url: 
+        username: 
+        password: 
         type: com.alibaba.druid.pool.DruidDataSource
         #   数据源其他配置
         initialSize: 5
