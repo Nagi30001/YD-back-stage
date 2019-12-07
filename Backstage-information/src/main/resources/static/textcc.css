@@ -1,0 +1,24 @@
+#bx td {
+    font-size: 20%;
+}
+
+.modal-body div {
+    width: 280px;
+
+}
+
+.modal-body div label {
+    width: 70px;
+}
+
+.modal-body div input {
+    width: 214px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/*修改鼠标悬浮表格颜色*/
+.table-hover>tbody>tr:hover {
+    background-color: rgba(236, 107, 245, 0.43) !important;
+}
+
