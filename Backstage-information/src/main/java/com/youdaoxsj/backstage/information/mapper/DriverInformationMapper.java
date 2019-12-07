@@ -1,8 +1,8 @@
 package com.youdaoxsj.backstage.information.mapper;
 
-import com.youdaoxsj.backstage.information.bean.ExtendDevice;
-import com.youdaoxsj.backstage.information.bean.ZbqDevice;
 import com.youdaoxsj.backstage.information.bean.ExtendInformation;
+import com.youdaoxsj.backstage.information.bean.ZbqDevice;
+import com.youdaoxsj.backstage.information.bean.ZbqReport;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -30,7 +30,7 @@ public interface DriverInformationMapper {
      * @param id    司机id
      * @return
      */
-    public Integer updateExtendInformation(@Param("e") ExtendInformation extendInformation, @Param("id") Integer id);
+    public int updateExtendInformation(@Param("e") ExtendInformation extendInformation);
 
 
     /**
@@ -38,7 +38,7 @@ public interface DriverInformationMapper {
      * @param extendInformation 新数据信息
      * @return
      */
-    public Integer insertExtendInformation(ExtendInformation extendInformation);
+    public int insertExtendInformation(@Param("ei") ExtendInformation extendInformation);
 
 
     public ZbqDevice selectDevice(Integer id);
@@ -47,4 +47,12 @@ public interface DriverInformationMapper {
     public ExtendInformation selectEI(Integer id);
 
     List<ZbqDevice> selectZbqDevices();
+
+    List<ZbqDevice> searchDriverByzbq(ZbqDevice zbqDevice);
+
+    List<ExtendInformation> selectExtendInformation();
+
+    List<ZbqReport> selectOnLineTime();
+
+    Integer updateZbqDevice(ZbqReport zbqReport);
 }

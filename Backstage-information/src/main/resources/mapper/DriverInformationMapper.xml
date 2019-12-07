@@ -22,14 +22,16 @@
       z.car_number,
       z.bank_no,
       z.bank_name,
-      z.longintude,
+      z.longitude,
       z.latitude,
       z.driver_id,
       z.push_code
     </sql>
     <!--public Device selectDriverInformation();-->
     <select id="selectDriverInformation" resultType="com.youdaoxsj.backstage.information.bean.ZbqDevice">
-        SELECT <include refid="zbqsql"/> FROM zbq_advert z
+        SELECT
+        <include refid="zbqsql"/>
+        FROM zbq_advert z
     </select>
 
     <!--public ExtendInformation selectSIMInformation-->
@@ -37,27 +39,42 @@
         select * from zbq_extend_information where id=#{id}
     </select>
 
-    <!--public Integer reviseExtendInformation(ExtendInformation extendInformation)-->
-    <update id="reviseExtendInformation" parameterType="com.youdaoxsj.backstage.information.bean.ExtendInformation" >
+    <!--public int updateExtendInformation(@Param("e") ExtendInformation extendInformation);-->
+    <update id="updateExtendInformation">
         update zbq_extend_information set
-        device_iccid = #{e.deviceIccid},
-        iccid_traffic = #{e.iccidTraffic},
-        iccid_onLine = #{e.iccidOnLine},
-        iccid_state = #{e.iccidState},
-        iccid_limit = #{e.iccidLimit},
-        iccid_activate = #{e.iccidActivate},
-        device_note = #{e.deviceNote}
-        where device_id = #{id}
+        <if test="#{e.deviceIccid} != null">
+            device_iccid = #{e.deviceIccid},
+            iccid_traffic = #{e.iccidTraffic},
+            iccid_onLine = #{e.iccidOnLine},
+            iccid_state = #{e.iccidState},
+            iccid_limit = #{e.iccidLimit},
+            iccid_activate = #{e.iccidActivate}
+        </if>
+        <if test="#{e.deviceNote} != null">
+            ,device_note = #{e.deviceNote}
+        </if>
+        where device_id = #{e.deviceId}
     </update>
 
     <!--public Integer insertExtendInformation(ExtendInformation extendInformation)-->
-    <insert id="insertExtendInformation" parameterType="com.youdaoxsj.backstage.information.bean.ExtendInformation" >
-        INSERT INTO zbq_extend_information(device_id, <if test="#{e.deviceIccid} == null">device_iccid, iccid_traffic, iccid_onLine, iccid_state, iccid_limit, iccid_activate,</if> device_note)
-        VALUES (#{e.deviceId},
-        <if test="#{e.deviceIccid} == null">
-            #{e.deviceIccid},#{e.iccidTraffic},#{e.iccidOnLine},#{e.iccidState},#{e.iccidLimit},#{e.iccidActivate},
-        </if>>
-        #{e.deviceNote})
+    <insert id="insertExtendInformation" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zbq_extend_information (device_id
+        <if test="#{ei.deviceIccid} != null">
+            ,device_iccid, iccid_traffic, iccid_onLine, iccid_state, iccid_limit,iccid_activate
+        </if>
+        <if test="#{ei.deviceNote} != null">
+            ,device_note
+        </if>
+        )
+        VALUES (
+        #{ei.deviceId}
+        <if test="#{ei.deviceIccid} != null">
+            ,#{ei.deviceIccid},#{ei.iccidTraffic},#{ei.iccidOnLine},#{ei.iccidState},#{ei.iccidLimit},#{ei.iccidActivate}
+        </if>
+        <if test="#{ei.deviceNote} != null">
+            ,#{ei.deviceNote}
+        </if>
+        )
     </insert>
 
 
@@ -67,12 +84,48 @@
     </select>
 
     <!--public ExtendInformation selectEI(Integer id);-->
-    <select id="selectEI" resultType="com.youdaoxsj.backstage.information.bean.ExtendInformation" parameterType="java.lang.Integer">
+    <select id="selectEI" resultType="com.youdaoxsj.backstage.information.bean.ExtendInformation">
         select * from zbq_extend_information where device_id = #{id}
     </select>
 
     <!--List<ZbqDevice> selectZbqDevices();-->
     <select id="selectZbqDevices" resultType="zbqDevice">
-        select * from zbq_device where status=1
+        select * from zbq_device
     </select>
+
+    <!--ZbqDevice searchDriverByzbq(ZbqDevice zbqDevice);-->
+    <select id="searchDriverByzbq" resultType="com.youdaoxsj.backstage.information.bean.ZbqDevice">
+        SELECT *
+        FROM zbq_device
+        <where>
+            <if test="driverName != null ">
+                and driver_name LIKE #{driverName}
+            </if>
+            <if test="mobile != null ">
+                and mobile LIKE #{mobile}
+            </if>
+            <if test="carNumber != null ">
+                AND car_number LIKE #{carNumber}
+            </if>
+        </where>
+    </select>
+
+    <!--List<ExtendInformation> selectExtendInformation();-->
+    <select id="selectExtendInformation" resultType="com.youdaoxsj.backstage.information.bean.ExtendInformation">
+      select * from zbq_extend_information
+    </select>
+
+
+    <!--List<ZbqDevice> selectOnLineTime();-->
+    <select id="selectOnLineTime" resultType="com.youdaoxsj.backstage.information.bean.ZbqReport">
+        select device_id,driver_name,sum(online_time) as online_time from zbq_report where record_time > 1575129600 group by device_id
+    </select>
+
+
+    <!-- Integer updateZbqDevice();-->
+    <update id="updateZbqDevice" >
+        update zbq_device set online_time = #{onlineTime} where id = #{deviceId}
+    </update>
+
+
 </mapper>

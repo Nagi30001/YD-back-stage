@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +17,7 @@ public class ZbqDevice {
     private String driverName;
     private String mobile;
     private Integer districtId;
-    private String onlineTime;
+    private Double onlineTime;
     private String initTime;
     private Integer advertId;
     private String lastLoginTime;
@@ -30,4 +32,11 @@ public class ZbqDevice {
     private String latitude;
     private Integer driverId;
     private Integer pushCode;
+    private Double  pjsj;
+
+    private Date recordTime2;
+    private Date lastLoginTime2;
+    private Date lastReportTime2;
+
+
 }
