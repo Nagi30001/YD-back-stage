@@ -1,9 +1,9 @@
 spring:
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: 
-        username: 
-        password: 
+        url:
+        username:
+        password:
         type: com.alibaba.druid.pool.DruidDataSource
         #   数据源其他配置
         initialSize: 5
@@ -35,6 +35,9 @@ spring:
         servlet:
             content-type: text/html
         cache: false
+    mvc:
+        static-path-pattern: /static/**
+
 #application.properties/application.yml
 #以下是通过xml文件来进行查询
 mybatis:
@@ -49,8 +52,12 @@ mybatis:
         map-underscore-to-camel-case: true
 server:
     port: 8080
-#更改日志输出等级
+#更改日志输出等级 配置日志输出地址
 logging:
-    level:
-        com:
-            jiuxia: trace
+    file:
+#        name: youdaoMsg.log
+        path: /var/logs
+
+        #    level:
+        #        com.youdaoxsj.backstage.information.mapper: debug
+
