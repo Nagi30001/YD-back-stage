@@ -98,4 +98,17 @@ public interface DriverInformationMapper {
      */
     Integer getSearchLSize(@Param("zz")  ZbqDevice zbqDevice);
 
+    /***
+     * 查询该车牌号信息
+     * @param carNum
+     * @return
+     */
+    List<ZbqDevice> getDriverByCarNum(String carNum);
+
+    /**
+     * 查询该车牌号是否存在
+     * @param carNum
+     * @return
+     */
+    Integer getCountDriverByCarNum(String carNum);
 }

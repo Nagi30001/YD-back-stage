@@ -3,6 +3,7 @@ package com.youdaoxsj.backstage.information.controller;
 
 import com.youdaoxsj.backstage.information.bean.ExtendDevice;
 import com.youdaoxsj.backstage.information.bean.IccidMsg;
+import com.youdaoxsj.backstage.information.bean.ZbqDevice;
 import com.youdaoxsj.backstage.information.service.DriverInformationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -118,6 +119,28 @@ public class DrverInformationController {
        IccidMsg iccidMsg =  driverInformationService.searchIccidMsg(iccid);
 
        return iccidMsg;
+    }
+
+    /**
+     * 公众号用于车牌号查询时长
+     * @param carNum
+     * @return
+     */
+    @RequestMapping("/getDriverTime")
+    @ResponseBody
+    public ZbqDevice getDriverTime(String carNum){
+
+        ZbqDevice zbqDevice = driverInformationService.getDriverByCarNum(carNum);
+        return zbqDevice;
+    }
+
+    /**
+     * 公众号查询时间页面展示
+     * @return
+     */
+    @RequestMapping("/driverTime")
+    public String showTimeDriver(){
+        return "driverTime";
     }
 
 

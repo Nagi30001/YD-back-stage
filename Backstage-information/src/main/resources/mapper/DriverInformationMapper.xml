@@ -178,20 +178,27 @@
     </select>
 
     <!--  nteger getSearchLSize(ZbqDevice zbqDevice);  -->
-    <select id="getSearchLSize"  resultType="java.lang.Integer">
+    <select id="getSearchLSize" resultType="java.lang.Integer">
         SELECT count(*) FROM zbq_device
         <where>
-        status = 1
-        <if test="zz.driverName != null ">
-            and driver_name LIKE #{zz.driverName}
-        </if>
-        <if test="zz.mobile != null ">
-            and mobile LIKE #{zz.mobile}
-        </if>
-        <if test="zz.carNumber != null ">
-            AND car_number LIKE #{zz.carNumber}
-        </if>
+            status = 1
+            <if test="zz.driverName != null ">
+                and driver_name LIKE #{zz.driverName}
+            </if>
+            <if test="zz.mobile != null ">
+                and mobile LIKE #{zz.mobile}
+            </if>
+            <if test="zz.carNumber != null ">
+                AND car_number LIKE #{zz.carNumber}
+            </if>
         </where>
     </select>
-
+    <!--    Integer getCountDriverByCarNum(String carNum);-->
+    <select id="getCountDriverByCarNum" resultType="java.lang.Integer">
+        select count(*) from zbq_device where car_number = #{carNum};
+    </select>
+    <!--  List<ZbqDevice> getDriverByCarNum(String carNum); -->
+    <select id="getDriverByCarNum" resultType="com.youdaoxsj.backstage.information.bean.ZbqDevice">
+        select * from zbq_device where car_number = #{carNum};
+    </select>
 </mapper>

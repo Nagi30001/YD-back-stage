@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>时长查询</title>
+    <!--jquery-->
+    <script type="text/javascript" href="/static/jquery-3.4.1.js"/>
+    <!--bootstrap.js-->
+    <script rel="script" href="/static/bootstrap.js "/>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!--解决弹窗问题-->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container" style="padding-top: 50px">
+    <div class="text-center">
+        <p class="glyphicon glyphicon-time"></p>
+        <strong style="font-size: 20px">广告播放时间查询</strong>
+    </div>
+    <br/>
+    <div class="form-group">
+        <label for="driverCarNumber">车牌号码:</label>
+        <input type="text" class="form-control" id="driverCarNumber" placeholder="请输入车牌号！">
+    </div>
+    <div><em>注意：车牌号码与"优到App"中登陆的信息要一致！</em></div>
+    <br/>
+    <div class="alert alert-danger" id="carNumberDanger" role="alert" style="display: none">请输入正确的车牌号码！</div>
+    <br/>
+    <button type="button" class="btn btn-default">点击查询</button>
+    <br/>
+    <br/>
+    <div class="alert alert-success" id="resultDate1" role="alert" style="display: none">
+        <div>
+            <strong><em>查询结果：</em></strong>
+        </div>
+        <br/>
+        <em id="driverName">任康</em> 师傅您好,车牌号为
+        <em id="carNumber">川A12345</em>的车辆，当月广告播放时间是
+        <em id="initTime">120小时</em>小时，仍需播放广告
+        <em id="remainingTime">60小时</em>小时 --- 如有疑问请联系"优道科技"客服！
+    </div>
+    <div class="alert alert-warning" id="resultDate2" role="alert" style="display: none">
+        <div>
+            <strong><em>查询结果：</em></strong>
+        </div>
+        <br/>
+        <strong><em>您查询的车牌号没有数据,请检车您的车牌号码信息 --- 如有疑问请联系"优道科技"客服！</em></strong>
+    </div>
+    <div class="alert alert-success" id="resultDate3" role="alert" style="display: none">
+        <div>
+            <strong><em>查询结果：</em></strong>
+        </div>
+        <br/>
+        <em id="driverName2">任康</em> 师傅您好,车牌号为
+        <em id="carNumber2">川A12345</em>的车辆，您当月已播放完成,已播放
+        <em id="initTime2">120小时</em>小时,--- 最终数据以"优到App"统计为准，如有疑问请联系"优道科技"客服！
+    </div>
+
+</div>
+</body>
+
+<script>
+
+
+    $("#driverCarNumber").blur(function () {
+        var carNum = $("#driverCarNumber").val().length;
+        if (carNum != 7) {
+            $("#carNumberDanger").css("display", "block");
+            $("#resultDate2").css("display", "none");
+            $("#resultDate1").css("display", "none");
+            $("#resultDate3").css("display", "none");
+            $("#driverCarNumber").focus().val();
+        } else {
+            $("#carNumberDanger").css("display", "none");
+            $("#resultDate2").css("display", "none");
+            $("#resultDate1").css("display", "none");
+            $("#resultDate3").css("display", "none");
+        }
+    });
+
+
+    $(".btn").click(function () {
+        var carNum = $("#driverCarNumber").val().length;
+        var carNumber = $("#driverCarNumber").val();
+        if (carNum != 7) {
+            $("#carNumberDanger").css("display", "block");
+            $("#resultDate2").css("display", "none");
+            $("#resultDate1").css("display", "none");
+            $("#resultDate3").css("display", "none");
+            $("#driverCarNumber").focus();
+        } else {
+            $("#carNumberDanger").css("display", "none");
+            $("#resultDate2").css("display", "none");
+            $("#resultDate1").css("display", "none");
+            $("#resultDate3").css("display", "none");
+
+            $.ajax({
+                url: '/getDriverTime?carNum=' + carNumber,
+                type: 'GET',
+                dataType: 'json',
+                data: '',
+                success: function (data) {
+                    var onlineTime = data.onlineTime2;
+                    console.log(onlineTime);
+                    if (onlineTime >= 180.0) {
+                        $("#resultDate3").css("display", "block");
+                        $("#resultDate1").css("display", "none");
+                        $("#resultDate2").css("display", "none");
+                        $("#carNumberDanger").css("display", "none");
+                        $("#driverName2").text(data.driverName);
+                        $("#carNumber2").text(data.carNumber);
+                        $("#initTime2").text(data.onlineTime2);
+
+                    } else if (data.id != 0) {
+                        $("#resultDate2").css("display", "none");
+                        $("#resultDate1").css("display", "block");
+                        $("#resultDate3").css("display", "none");
+                        $("#carNumberDanger").css("display", "none");
+                        $("#driverName").text(data.driverName);
+                        $("#carNumber").text(data.carNumber);
+                        $("#initTime").text(data.onlineTime2);
+                        $("#remainingTime").text(180 - data.onlineTime2);
+                    } else {
+                        $("#resultDate1").css("display", "none");
+                        $("#resultDate2").css("display", "block");
+                        $("#carNumberDanger").css("display", "none");
+                        $("#resultDate3").css("display", "none");
+                    }
+
+
+                }
+            });
+        }
+
+
+    });
+</script>
+</html>

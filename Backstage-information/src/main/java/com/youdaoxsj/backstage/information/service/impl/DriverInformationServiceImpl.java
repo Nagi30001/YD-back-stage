@@ -295,5 +295,20 @@ public class DriverInformationServiceImpl implements DriverInformationService {
 
         return strings;
     }
+
+    @Override
+    public ZbqDevice getDriverByCarNum(String carNum) {
+        Integer countDriverByCarNum = driverInformationMapper.getCountDriverByCarNum(carNum.trim());
+        if (countDriverByCarNum<1){
+            //打桩
+            System.out.println(countDriverByCarNum);
+            ZbqDevice zbqDevice = new ZbqDevice();
+            zbqDevice.setId(0);
+            return zbqDevice;
+        }
+        List<ZbqDevice> zbqDevices = driverInformationMapper.getDriverByCarNum(carNum.trim());
+        zbqDevices = getFormatTime(zbqDevices);
+        return zbqDevices.get(0);
+    }
 }
 

@@ -5,12 +5,12 @@
     <title>司机信息</title>
     <link rel="stylesheet" type="text/css" href="/static/textcc.css"/>
 
+    <!--jquery-->
     <script type="text/javascript" href="/static/jquery-3.4.1.js"/>
     <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
     <!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"-->
     <!--          crossorigin="anonymous">-->
 
-    <!--jquery-->
 
     <!--bootstrap.js-->
     <script rel="script" href="/static/bootstrap.js "/>
@@ -266,16 +266,19 @@
         var iccid = $(this).text();
         var iccidState = iccid + 'state';
         var iccidTraffic = iccid + 'traffic';
-        $.ajax({
-            url: '/getIccidMsg?iccid=' + iccid,
-            type: 'GET',
-            dataType: 'json',
-            data: '',
-            success: function (data) {
-                $("#" + iccidState).text(data.status);
-                $("#" + iccidTraffic).text(data.ctdDataUsage + "MB");
-            }
-        });
+        if (iccid != "---" && iccid !=''){
+            $.ajax({
+                url: '/getIccidMsg?iccid=' + iccid,
+                type: 'GET',
+                dataType: 'json',
+                data: '',
+                success: function (data) {
+                    $("#" + iccidState).text(data.status);
+                    $("#" + iccidTraffic).text(data.ctdDataUsage + "MB");
+                }
+            });
+        }
+
     });
 
 

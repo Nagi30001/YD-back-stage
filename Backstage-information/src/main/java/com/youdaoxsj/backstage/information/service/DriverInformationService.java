@@ -75,4 +75,11 @@ public interface DriverInformationService {
      * @return
      */
     List<String> getSortName(String sortName);
+
+    /**
+     * 公众号用于车牌号查询时长
+     * @param carNum 车牌号码
+     * @return 司机信息对象
+     */
+    ZbqDevice getDriverByCarNum(String carNum);
 }
