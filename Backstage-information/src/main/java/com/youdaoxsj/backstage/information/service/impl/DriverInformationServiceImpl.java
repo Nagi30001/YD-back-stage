@@ -21,9 +21,9 @@ public class DriverInformationServiceImpl implements DriverInformationService {
     @Autowired
     private DriverInformationMapper driverInformationMapper;
 
-    private DateUtils dateUtils = new DateUtils();
-
     private Integer lenght = 1;
+
+    private String sortName;
 
     /**
      * 每页多少行
@@ -105,12 +105,13 @@ public class DriverInformationServiceImpl implements DriverInformationService {
         sortPage = sortPage * 50 - 50;
 
         List<ZbqDevice> zbqDevices = driverInformationMapper.searchDriverByzbq(zbqDevice, sortName, sortPage, PAGE_NUM);
-        int integer = zbqDevices.size();
+        int integer = driverInformationMapper.getSearchLSize(zbqDevice);
         if (integer % 50 == 0) {
             lenght = integer / 50;
         } else {
             lenght = integer / 50 + 1;
         }
+
 
         List<ExtendDevice> extendDevice = getExtendDevice(zbqDevices);
 
@@ -209,7 +210,7 @@ public class DriverInformationServiceImpl implements DriverInformationService {
             }
             if (extendInformation.getDeviceIccid() != null && !extendInformation.getDeviceIccid().trim().equals("---")) {
                 //获取ICCID相关信息
-                extendInformation = getExtendInformationByEX(extendInformation);
+//                extendInformation = getExtendInformationByEX(extendInformation);
             }
             ExtendDevice extendDevice = new ExtendDevice();
             extendDevice.setExtendInformation(extendInformation);
@@ -245,5 +246,54 @@ public class DriverInformationServiceImpl implements DriverInformationService {
         return extendInformation;
     }
 
+
+    public List<String> getSortName(String sortName) {
+        String sortNameonlineTime;
+        String newSortNamelastReportTime;
+        String newSortNamerecordTime;
+        if (sortName.trim().equals("online_time_asc")) {
+            sortNameonlineTime = "online_time_desc";
+            newSortNamelastReportTime = "last_report_time_asc";
+            newSortNamerecordTime = "record_time_asc";
+            System.out.println("---1---");
+        } else if (sortName.trim().equals("online_time_desc")) {
+            sortNameonlineTime = "online_time_asc";
+            newSortNamelastReportTime = "last_report_time_asc";
+            newSortNamerecordTime = "record_time_asc";
+            System.out.println("---2---");
+        } else if (sortName.trim().equals("last_report_time_asc")) {
+            sortNameonlineTime = "online_time_asc";
+            newSortNamelastReportTime = "last_report_time_desc";
+            newSortNamerecordTime = "record_time_asc";
+            System.out.println("---3---");
+        } else if (sortName.trim().equals("last_report_time_desc")) {
+            sortNameonlineTime = "online_time_asc";
+            newSortNamelastReportTime = "last_report_time_asc";
+            newSortNamerecordTime = "record_time_asc";
+            System.out.println("---4---");
+        } else if (sortName.trim().equals("record_time_asc")) {
+            sortNameonlineTime = "online_time_asc";
+            newSortNamelastReportTime = "last_report_time_asc";
+            newSortNamerecordTime = "record_time_desc";
+            System.out.println("---5---");
+        } else if (sortName.trim().equals("record_time_desc")) {
+            sortNameonlineTime = "online_time_asc";
+            newSortNamelastReportTime = "last_report_time_asc";
+            newSortNamerecordTime = "record_time_asc";
+            System.out.println("---6---");
+        } else {
+            sortNameonlineTime = "online_time_asc";
+            newSortNamelastReportTime = "last_report_time_asc";
+            newSortNamerecordTime = "record_time_asc";
+            System.out.println("---7---");
+        }
+
+        List<String> strings = new ArrayList<>();
+        strings.add(sortNameonlineTime);
+        strings.add(newSortNamelastReportTime);
+        strings.add(newSortNamerecordTime);
+
+        return strings;
+    }
 }
 

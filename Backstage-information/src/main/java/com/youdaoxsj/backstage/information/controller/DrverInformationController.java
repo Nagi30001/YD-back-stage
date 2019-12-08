@@ -19,6 +19,8 @@ public class DrverInformationController {
     @Autowired
     private DriverInformationService driverInformationService;
 
+    private String nowSortName;
+
 
     /**
      * 获取司机信息
@@ -30,6 +32,11 @@ public class DrverInformationController {
     @RequestMapping("/hello1")
     public String hello1(ModelMap modelMap,@RequestParam(value = "sortName", defaultValue = "last_report_time_asc") String sortName,@RequestParam(value = "sortPage", defaultValue = "1") Integer sortPage) {
         List<ExtendDevice> extendDevices = driverInformationService.searchDevs(sortName,sortPage);
+        List<String> sortName1 = driverInformationService.getSortName(sortName);
+
+
+
+
         Integer lenght = driverInformationService.getZbqDeviceCount();
         //司机信息
         modelMap.addAttribute("extendDevices", extendDevices);
@@ -37,6 +44,10 @@ public class DrverInformationController {
         modelMap.addAttribute("lenght",lenght);
         //当前页
         modelMap.addAttribute("sortPage",sortPage);
+        //排序字段
+        modelMap.addAttribute("sortName1",sortName1);
+        //当前排序字段
+        modelMap.addAttribute("sortName",sortName);
         return "index";
     }
 

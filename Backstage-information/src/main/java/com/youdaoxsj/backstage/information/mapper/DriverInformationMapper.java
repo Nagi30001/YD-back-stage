@@ -91,4 +91,11 @@ public interface DriverInformationMapper {
      */
     Integer updateZbqDevice(Integer deviceId);
 
+    /**
+     * 根据查询条件获取查询结果长度
+     * @param zbqDevice 查询数据
+     * @return 长度
+     */
+    Integer getSearchLSize(@Param("zz")  ZbqDevice zbqDevice);
+
 }

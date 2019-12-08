@@ -21,8 +21,7 @@ public class HttpRequest {
      * //     * @param param：请求参数，请求参数应该是 name1=value1&name2=value2&name3=value3 的形式。
      * //     * @return String[result]：所代表远程资源的响应结果
      */
-    public static IccidMsg sendGet(String iccid) {
-
+    public static synchronized IccidMsg sendGet(String iccid) {
         String result = "";
         BufferedReader in = null;
         try {

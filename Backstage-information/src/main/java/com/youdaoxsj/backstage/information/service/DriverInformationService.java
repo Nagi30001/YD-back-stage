@@ -68,4 +68,11 @@ public interface DriverInformationService {
      * @return
      */
     Integer getsearchDriverLenght();
+
+    /**
+     * 获取排序后的字段
+     * @param sortName
+     * @return
+     */
+    List<String> getSortName(String sortName);
 }
